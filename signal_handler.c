@@ -1,38 +1,41 @@
 /**
- * @file signal_handler.c
- * @brief Sets a signal handler for SIGINT, the handler prints a message and then quits
- */
-
-/**
- * Modified by:
+ * Modified by: Christian Gulak
  * 
  * Brief summary of modifications:
+ * - Modified the infinite loop to terminate the program by sending a SIGKILL signal to itself.
  */
+
 
 
 #include <signal.h>
 #include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-/**
- * @brief Signal handler for SIGINT - prints a message and exits
- */
-void handle_signal() {
-    printf("Received a signal\n");
-    exit(1);
+
+void handle_signal(int sig) {
+    printf("Received SIGINT (Signal %d). Program will continue running.\n", sig);
 }
 
 int main() {
-
-    // Register for the signal
+    // Register the signal handler for SIGINT
     signal(SIGINT, handle_signal);
 
-    // Wait until a signal is received
-    while(1) {
-        printf("Sleeping\n");
-        sleep(1);
+    // Print the PID for reference
+    printf("Program is running (PID: %d).\n", getpid());
+    printf("Send SIGINT (Ctrl+C) to see the handler in action.\n");
+
+    // Infinite loop 
+    while (1) {
+        printf("Sleeping...\n");
+        sleep(3); // Simulate work
+
+        // Terminate by sending SIGKILL to itself
+        printf("Self-terminating using SIGKILL...\n");
+        kill(getpid(), SIGKILL);
     }
 
     return 0;
 }
+
+
